@@ -54,6 +54,7 @@ function filtirirajVulgarneBesede(vhod) {
 
 $(document).ready(function() {
   var klepetApp = new Klepet(socket);
+  $('#vsebina').jrumble();
 
   socket.on('vzdevekSpremembaOdgovor', function(rezultat) {
     var sporocilo;
@@ -67,6 +68,13 @@ $(document).ready(function() {
     $('#sporocila').append(divElementHtmlTekst(sporocilo));
   });
 
+  socket.on('dregljaj', function() {
+      
+      $('#vsebina').trigger('startRumble');
+      setTimeout(function(){ $('#vsebina').trigger('stopRumble'); }, 1500);
+       
+  })
+  
   socket.on('pridruzitevOdgovor', function(rezultat) {
     trenutniKanal = rezultat.kanal;
     $('#kanal').text(trenutniVzdevek + " @ " + trenutniKanal);
