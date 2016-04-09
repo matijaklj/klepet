@@ -57,7 +57,7 @@ function procesirajVnosUporabnika(klepetApp, socket) {
 
   $('#poslji-sporocilo').val('');
 }
-
+ 
 var socket = io.connect();
 var trenutniVzdevek = "", trenutniKanal = "";
 
