@@ -12,9 +12,33 @@ function divElementHtmlTekst(sporocilo) {
   return $('<div></div>').html('<i>' + sporocilo + '</i>');
 }
 
+function divElementSlika(urlSlike) {
+  return $('<img src="' + urlSlike + '"/>').addClass("slika");
+}
+
+function poisciSlike(sporocilo) {
+  //console.log("nekaj je najdlo");
+  var jeSlika = new RegExp('((http|https):\\/\\/[^ "]+(\\.jpg|\\.gif|\\.png)\\b)', 'gi');
+  if(jeSlika.test(sporocilo)) {
+    var arraySlik = sporocilo.match(jeSlika);
+    //console.log("nekaj je najdlo");
+    return arraySlik;
+  }
+  
+}
+
+function prikaziSlike(arraySlik) {
+  for(var i = 0; i < arraySlik.length; i++) {
+    //console.log(arraySlik[i]);
+    $('#sporocila').append(divElementSlika(arraySlik[i]));
+  }
+}
+
 function procesirajVnosUporabnika(klepetApp, socket) {
   var sporocilo = $('#poslji-sporocilo').val();
-  sporocilo = dodajSmeske(sporocilo);
+  var slike = poisciSlike(sporocilo);
+  sporocilo = filtirirajVulgarneBesede(sporocilo);
+  prikaziSporocilo = dodajSmeske(sporocilo);
   var sistemskoSporocilo;
 
   if (sporocilo.charAt(0) == '/') {
@@ -23,9 +47,11 @@ function procesirajVnosUporabnika(klepetApp, socket) {
       $('#sporocila').append(divElementHtmlTekst(sistemskoSporocilo));
     }
   } else {
-    sporocilo = filtirirajVulgarneBesede(sporocilo);
+    
+    
     klepetApp.posljiSporocilo(trenutniKanal, sporocilo);
-    $('#sporocila').append(divElementEnostavniTekst(sporocilo));
+    $('#sporocila').append(divElementEnostavniTekst(prikaziSporocilo));
+    prikaziSlike(slike)
     $('#sporocila').scrollTop($('#sporocila').prop('scrollHeight'));
   }
 
@@ -74,8 +100,12 @@ $(document).ready(function() {
   });
 
   socket.on('sporocilo', function (sporocilo) {
-    var novElement = divElementEnostavniTekst(sporocilo.besedilo);
+    var novElement = divElementEnostavniTekst(dodajSmeske(sporocilo.besedilo));
+    var slike = poisciSlike(sporocilo.besedilo);
     $('#sporocila').append(novElement);
+    prikaziSlike(slike);
+    
+    
   });
   
   socket.on('kanali', function(kanali) {
