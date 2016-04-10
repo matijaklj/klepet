@@ -12,6 +12,7 @@ function divElementHtmlTekst(sporocilo) {
   return $('<div></div>').html('<i>' + sporocilo + '</i>');
 }
 
+
 function divElementSlika(urlSlike) {
   return $('<img src="' + urlSlike + '"/>').addClass("slika");
 }
@@ -24,7 +25,6 @@ function poisciSlike(sporocilo) {
     //console.log("nekaj je najdlo");
     return arraySlik;
   }
-  
 }
 
 function prikaziSlike(arraySlik) {
@@ -34,11 +34,42 @@ function prikaziSlike(arraySlik) {
   }
 }
 
+function iframeElementVideo(video) {
+  console.log("https://www.youtube.com/embed/" + video);
+  return $('<iframe src="https://www.youtube.com/embed/' + video + '" allowfullscreen height="150" width="200" style="margin-left: 20px;></iframe>');
+}
+
+function najdiVideo(sporocilo) {
+  var regex = new RegExp('https:\\/\\/www\\.youtube\\.com\\/watch\\?v=([^ "]+)', 'gi');
+  var videos = [];
+  var match = regex.exec(sporocilo);
+  while(match != null){
+    videos.push(match[1]);
+    match = regex.exec(sporocilo);
+  }
+  return videos;
+}
+
+function prikaziVideo (videos) {
+  for(var i = 0; i < videos.length; i++) {
+    console.log("https://www.youtube.com/embed/" + videos[i] + " to bi moglo priakzat");
+    $('#sporocila').append($('<iframe src="https://www.youtube.com/embed/' + videos[i] + '" allowfullscreen ></iframe>').addClass("video")); //height="150" width="200" style="margin-left: 20px
+    //$('#sporocila').append(iframeElementVideo(videos[i])); 
+  }
+}
+
+
+
+
 function procesirajVnosUporabnika(klepetApp, socket) {
   var sporocilo = $('#poslji-sporocilo').val();
   var slike = poisciSlike(sporocilo);
   sporocilo = filtirirajVulgarneBesede(sporocilo);
   prikaziSporocilo = dodajSmeske(sporocilo);
+
+  var videos = najdiVideo(sporocilo);
+  sporocilo = dodajSmeske(sporocilo);
+
   var sistemskoSporocilo;
 
   if (sporocilo.charAt(0) == '/') {
@@ -48,16 +79,18 @@ function procesirajVnosUporabnika(klepetApp, socket) {
     }
   } else {
     
-    
     klepetApp.posljiSporocilo(trenutniKanal, sporocilo);
+
     $('#sporocila').append(divElementEnostavniTekst(prikaziSporocilo));
-    if(slike) prikaziSlike(slike);
+    if(slike != null) prikaziSlike(slike);
+    prikaziVideo(videos);
+
     $('#sporocila').scrollTop($('#sporocila').prop('scrollHeight'));
   }
 
   $('#poslji-sporocilo').val('');
 }
-
+  
 var socket = io.connect();
 var trenutniVzdevek = "", trenutniKanal = "";
 
@@ -100,11 +133,13 @@ $(document).ready(function() {
   });
 
   socket.on('sporocilo', function (sporocilo) {
+
     var novElement = divElementEnostavniTekst(dodajSmeske(sporocilo.besedilo));
     var slike = poisciSlike(sporocilo.besedilo);
     $('#sporocila').append(novElement);
     prikaziSlike(slike);
-    
+    var videos = najdiVideo(sporocilo.besedilo);
+    prikaziVideo(videos);
     
   });
   
@@ -129,6 +164,11 @@ $(document).ready(function() {
     for (var i=0; i < uporabniki.length; i++) {
       $('#seznam-uporabnikov').append(divElementEnostavniTekst(uporabniki[i]));
     }
+    
+    $('#seznam-uporabnikov div').click(function() {
+        $('#poslji-sporocilo').val("/zasebno \"" + $(this).text() + "\" ");
+        $('#poslji-sporocilo').focus();
+    });
     
     $('#seznam-uporabnikov div').click(function() {
         $('#poslji-sporocilo').val("/zasebno \"" + $(this).text() + "\" ");
