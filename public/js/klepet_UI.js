@@ -146,7 +146,7 @@ $(document).ready(function() {
     var slike = poisciSlike(sporocilo.besedilo);
     var videos = najdiVideo(sporocilo.besedilo);
     $('#sporocila').append(novElement);
-    prikaziSlike(slike);
+    if(slike != null) prikaziSlike(slike);
     prikaziVideo(videos);
     
   });
