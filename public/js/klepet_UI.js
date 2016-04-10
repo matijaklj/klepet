@@ -51,7 +51,7 @@ function procesirajVnosUporabnika(klepetApp, socket) {
     
     klepetApp.posljiSporocilo(trenutniKanal, sporocilo);
     $('#sporocila').append(divElementEnostavniTekst(prikaziSporocilo));
-    prikaziSlike(slike)
+    if(slike) prikaziSlike(slike);
     $('#sporocila').scrollTop($('#sporocila').prop('scrollHeight'));
   }
 
