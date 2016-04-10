@@ -144,9 +144,9 @@ $(document).ready(function() {
 
     var novElement = divElementEnostavniTekst(dodajSmeske(sporocilo.besedilo));
     var slike = poisciSlike(sporocilo.besedilo);
+    var videos = najdiVideo(sporocilo.besedilo);
     $('#sporocila').append(novElement);
     prikaziSlike(slike);
-    var videos = najdiVideo(sporocilo.besedilo);
     prikaziVideo(videos);
     
   });
